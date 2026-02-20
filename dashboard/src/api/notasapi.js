@@ -1,4 +1,4 @@
-// src/api/notes.api.js
+// src/api/notasapi.js
 export const getNotes = async () => {
   // fetch al backend
 };

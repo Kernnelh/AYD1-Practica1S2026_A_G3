@@ -3,11 +3,13 @@ import { Routes, Route } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
 import Navbar from "./components/navbar";
 import Notas from "./pages/Notas";
+import ModificarNotas from "./pages/ModificarNotas";
 import "./App.css";
 import { IoNotificationsCircle } from "react-icons/io5";
 
 function App() {
   const [showNav, setShowNav] = useState(false);
+  const [notes, setNotes] = useState([]);
 
   return (
     <>
@@ -28,8 +30,16 @@ function App() {
       <Navbar show={showNav} />
 
       <div className={`main ${showNav ? "shifted" : ""}`}>
+        {/* Rutas */}
         <Routes>
-          <Route path="/" element={<Notas />} />
+          <Route
+            path="/"
+            element={<Notas notes={notes} setNotes={setNotes} />}
+          />
+          <Route
+            path="/modify"
+            element={<ModificarNotas notes={notes} setNotes={setNotes} />}
+          />
         </Routes>
       </div>
     </>

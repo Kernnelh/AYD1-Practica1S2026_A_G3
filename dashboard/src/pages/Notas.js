@@ -2,9 +2,8 @@ import { useState } from "react";
 import { FaTag } from "react-icons/fa";
 import { IoMdEye, IoMdClose } from "react-icons/io";
 
-const Notas = () => {
+const Notas = ({ notes, setNotes }) => {
   const [showForm, setShowForm] = useState(false);
-  const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
 
   const [title, setTitle] = useState("");
@@ -30,6 +29,7 @@ const Notas = () => {
       title,
       description,
       tag,
+      createdAt: new Date().toISOString(),
     };
 
     setNotes([newNote, ...notes]);
@@ -91,6 +91,12 @@ const Notas = () => {
 
         {/* LISTA DE NOTAS */}
         <div className="notes-list">
+          {notes.length === 0 && (
+            <p style={{ marginTop: "20px", opacity: 0.7 }}>
+              Aún no hay notas creadas
+            </p>
+          )}
+
           {notes.map((note) => (
             <div key={note.id} className="note-item">
               <span>{note.title}</span>
