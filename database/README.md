@@ -185,6 +185,9 @@ docker run --name notecraft-mysql \
 
 Ejecutar: docker exec -i notecraft-mysql mysql -u root -proot notecraft < schema.sql
 
+## Ejecutar motor de MYSQL (server)
+![alt text](image.png)
+
 
 ⚠️ Recomendaciones
 
