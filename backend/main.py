@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from database import engine
+from routers import notas  # <-- NUEVO: Importamos tu router
 
 app = FastAPI()
+
+#Le decimos a FastAPI que use tus rutas de notas
+app.include_router(notas.router) 
 
 @app.get("/")
 def read_root():
@@ -10,8 +14,7 @@ def read_root():
 @app.get("/test-db")
 def test_db_connection():
     try:
-        # Intentamos abrir una conexión rápida al motor
         with engine.connect() as connection:
-            return {"mensaje": "¡Conexión a MySQL exitosa"}
+            return {"mensaje": "¡Conexión a MySQL exitosa!"}
     except Exception as e:
         return {"error": f"Falló la conexión: {str(e)}"}
