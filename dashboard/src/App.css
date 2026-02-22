@@ -350,3 +350,43 @@ header svg {
   align-items: center;
   gap: 6px;
 }
+
+/*ARCHIVADOS*/
+.archived-layout {
+  padding: 20px;        /* espacio general */
+}
+
+.archived-title {
+  color: #000;          /* texto negro */
+  margin-left: 20px;    /* ligera sangría */
+  margin-bottom: 5px;  /* espacio debajo del título */
+  font-weight: bold;
+}
+/*ARCHIVADOS*/
+
+
+
+/*FIJADOS*/
+.pinned-layout {
+  padding: 20px;        /* espacio general */
+}
+
+.pinned-title {
+  color: #000;          /* texto negro */
+  margin-left: 20px;    /* ligera sangría */
+  margin-bottom: 5px;   /* espacio debajo del título */
+  font-weight: bold;
+}
+
+.notes-list {
+  margin-left: 20px;    /* sangría para la lista */
+}
+
+.note-item {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/*FIJADOS*/

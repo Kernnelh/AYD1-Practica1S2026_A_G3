@@ -6,6 +6,10 @@ import Notas from "./pages/Notas";
 import "./App.css";
 import { IoNotificationsCircle } from "react-icons/io5";
 
+import Archivados from "./pages/Archivados";   
+import Fijados from "./pages/Fijados"; 
+import Compartidos from "./pages/Compartidos";
+
 function App() {
   const [showNav, setShowNav] = useState(false);
 
@@ -30,6 +34,11 @@ function App() {
       <div className={`main ${showNav ? "shifted" : ""}`}>
         <Routes>
           <Route path="/" element={<Notas />} />
+          <Route path="/archived" element={<Archivados />} />   // direccion localhost archivados
+          <Route path="/set" element={<Fijados />} />           // direccion localhost fijados    
+          <Route path="/shared" element={<Compartidos />} />
+             
+
         </Routes>
       </div>
     </>
