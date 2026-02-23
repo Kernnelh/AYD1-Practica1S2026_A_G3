@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { UserContext } from '../UserContext';
 import { FaTag, FaThumbtack } from "react-icons/fa";
 import { IoMdEye, IoMdClose } from "react-icons/io";
 import { GoArchive } from "react-icons/go";
@@ -15,6 +16,7 @@ const Notas = () => {
   const [tag, setTag] = useState("");
   const [tags, setTags] = useState([]);
   const [error, setError] = useState("");
+  const { user } = useContext(UserContext);
 
   // NUEVO: Cargar notas desde el backend al iniciar
   useEffect(() => {
@@ -60,7 +62,7 @@ const Notas = () => {
     }
 
     // Obtenemos el ID del usuario que se logueó, si no hay, usamos 1 por seguridad
-    const idUsuario = localStorage.getItem('usuario_id') || 1;
+    const idUsuario = (user && user.id) ? user.id : (localStorage.getItem('usuario_id') || 1);
 
     const nuevaNotaBD = {
       id_usuario: parseInt(idUsuario),

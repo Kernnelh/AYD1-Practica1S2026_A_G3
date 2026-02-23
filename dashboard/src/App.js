@@ -16,6 +16,7 @@ import ModificarNotas from "./pages/ModificarNotas";
 import Registro from './pages/Registro';
 import Perfil from './pages/Perfil';
 import InicioSesion from './pages/InicioSesion';
+import { UserProvider } from './UserContext';
 
 
 
@@ -60,6 +61,7 @@ function App() {
 
       <Navbar show={showNav} />
       
+      <UserProvider>
       <div className={`main ${showNav ? "shifted" : ""}`}>
         <Routes>
           {/* El login ahora es la página de inicio ("/") */}
@@ -77,11 +79,12 @@ function App() {
           <Route path="/modify" element={<ModificarNotas notes={notes} setNotes={setNotes} />} />
           
           {/* Rutas de tu compañero */}
-          <Route path="/register" element={<Registro />} />
+          <Route path="/registro" element={<Registro />} />
           <Route path="/profile" element={<Perfil />} />
           {/* Eliminé la ruta vieja de /login porque ya la pusimos en "/" */}
         </Routes>
       </div>
+      </UserProvider>
     </>
   );
 }

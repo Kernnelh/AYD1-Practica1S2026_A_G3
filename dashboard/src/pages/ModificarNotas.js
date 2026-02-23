@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { UserContext } from '../UserContext';
 import { FaEdit } from "react-icons/fa";
 import NoteForm from "../components/NoteForm";
 
 const ModificarNotas = ({ notes, setNotes }) => {
+  const { user } = useContext(UserContext);
   const [selectedNote, setSelectedNote] = useState(null);
 
   const handleUpdateNote = (updatedData) => {
