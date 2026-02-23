@@ -19,13 +19,24 @@ const Notas = () => {
   const { user } = useContext(UserContext);
 
   // NUEVO: Cargar notas desde el backend al iniciar
+// NUEVO: Cargar notas desde el backend filtradas por el usuario logueado
   useEffect(() => {
     const fetchNotas = async () => {
       try {
-        const respuesta = await fetch('http://localhost:8000/notas/');
+        // 1. Recuperamos el ID del usuario que inició sesión
+        const idUsuario = localStorage.getItem('usuario_id');
+        
+        // Si por alguna razón no hay usuario (alguien entró a la fuerza a la ruta), detenemos la ejecución
+        if (!idUsuario) {
+          console.warn("No hay sesión activa");
+          return;
+        }
+
+        // 2. Pasamos el ID por la URL como parámetro de búsqueda (?usuario_id=X)
+        const respuesta = await fetch(`http://localhost:8000/notas/?usuario_id=${idUsuario}`);
+        
         if (respuesta.ok) {
           const data = await respuesta.json();
-          // Mapeamos los nombres de la BD a los nombres que usa tu diseño frontend
           const notasFormateadas = data.map(n => ({
             id: n.id,
             title: n.titulo,
@@ -40,7 +51,7 @@ const Notas = () => {
       }
     };
     fetchNotas();
-  }, []);
+  }, []); // El array vacío asegura que esto solo corra 1 vez al cargar la pantalla
 
   const handleArchive = (note) => {
     setNotes(notes.filter((n) => n.id !== note.id));
