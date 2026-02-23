@@ -10,6 +10,17 @@ import Notas from "./pages/Notas";
 import Archivados from "./pages/Archivados";   
 import Fijados from "./pages/Fijados"; 
 import Compartidos from "./pages/Compartidos";
+import ModificarNotas from "./pages/ModificarNotas";
+
+// Páginas de tu compañero
+import Registro from './pages/Registro';
+import Perfil from './pages/Perfil';
+import InicioSesion from './pages/InicioSesion';
+
+
+
+
+
 
 function App() {
   const [showNav, setShowNav] = useState(false);
@@ -57,6 +68,17 @@ function App() {
           
           <Route path="/set" element={<Fijados />} />           
           <Route path="/shared" element={<Compartidos />} />
+          
+          <Route path="/modify" element={<ModificarNotas notes={notes} setNotes={setNotes} />} />
+          
+                  {/* Rutas de tu compañero */}
+          <Route path="/register" element={<Registro />} />
+          <Route path="/profile" element={<Perfil />} />
+          <Route path="/login" element={<InicioSesion />} />
+
+
+
+
           </Routes>
       </div>
     </>
@@ -66,3 +88,6 @@ function App() {
 export default App;
 
 // Funcionando correctamente
+
+
+// CAMBIOS

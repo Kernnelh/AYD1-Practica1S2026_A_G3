@@ -48,6 +48,7 @@ const Notas = ({ notes, setNotes, archivedNotes, setArchivedNotes }) => {
       title,
       description,
       tag,
+      createdAt: new Date().toISOString(),                                        //NUEVO                       
       pinned: false         // la funcionalidad para saber si esta o no fijada
     };
 
