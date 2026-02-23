@@ -1,21 +1,63 @@
-import { useState } from "react";
-import { FaTag } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaTag, FaThumbtack } from "react-icons/fa"; // Importamos el ícono de tachuela
 import { IoMdEye, IoMdClose } from "react-icons/io";
 
 const Fijados = () => {
   const [pinnedNotes, setPinnedNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
 
-  // Ejemplo inicial: luego se conectará al backend
-  const demoPinned = [
-    { id: 1, title: "Nota fijada 1", description: "Descripción de prueba", tag: "Importante" },
-    { id: 2, title: "Nota fijada 2", description: "Otra descripción", tag: "Urgente" }
-  ];
+  // 1. Cargar las notas fijadas del usuario desde MySQL
+  useEffect(() => {
+    const fetchPinnedNotas = async () => {
+      try {
+        const idUsuario = localStorage.getItem('usuario_id');
+        if (!idUsuario) return;
 
-  // Cargar notas de prueba al inicio
-  useState(() => {
-    setPinnedNotes(demoPinned);
+        const respuesta = await fetch(`http://localhost:8000/notas/?usuario_id=${idUsuario}`);
+        if (respuesta.ok) {
+          const data = await respuesta.json();
+          const notasFormateadas = data.map(n => ({
+            id: n.id,
+            title: n.titulo,
+            description: n.descripcion,
+            pinned: n.es_fijado,
+            archived: n.es_archivado
+          }));
+          
+          // FILTRO CLAVE: Solo guardamos las que están fijadas y NO están archivadas
+          setPinnedNotes(notasFormateadas.filter(n => n.pinned && !n.archived));
+        }
+      } catch (error) {
+        console.error("Error al cargar notas fijadas:", error);
+      }
+    };
+    fetchPinnedNotas();
   }, []);
+
+  // 2. Desfijar nota desde esta vista (PUT)
+  const handleUnpin = async (note) => {
+    try {
+      const respuesta = await fetch(`http://localhost:8000/notas/${note.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          es_fijado: false
+        })
+      });
+
+      if (respuesta.ok) {
+        // La quitamos de esta pantalla
+        setPinnedNotes(pinnedNotes.filter((n) => n.id !== note.id));
+        
+        // Cerramos el panel derecho si estaba abierto
+        if (selectedNote && selectedNote.id === note.id) {
+          setSelectedNote(null);
+        }
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+    }
+  };
 
   return (
     <div className="pinned-layout">
@@ -27,17 +69,26 @@ const Fijados = () => {
       {/* ===== LISTA DE NOTAS FIJADAS ===== */}
       <div className="notes-list">
         {pinnedNotes.length === 0 ? (
-          <p>No hay notas fijadas.</p>
+          <p style={{ color: "black", marginLeft: "10px" }}>No hay notas fijadas.</p>
         ) : (
           pinnedNotes.map((note) => (
             <div key={note.id} className="note-item">
               <span>{note.title}</span>
 
-              {/* Botón para ver detalles */}
-              <IoMdEye
-                className="eye-icon"
-                onClick={() => setSelectedNote(note)}
-              />
+              {/* Botones de acción */}
+              <div className="note-actions" style={{ display: 'flex', gap: '10px' }}>
+                <IoMdEye
+                  className="eye-icon"
+                  onClick={() => setSelectedNote(note)}
+                  style={{ cursor: "pointer" }}
+                />
+                {/* Agregamos el ícono para desfijar */}
+                <FaThumbtack 
+                  className="pin-icon pinned" 
+                  onClick={() => handleUnpin(note)}
+                  style={{ color: "#007bff", cursor: "pointer" }}
+                />
+              </div>
             </div>
           ))
         )}
@@ -51,6 +102,7 @@ const Fijados = () => {
             <IoMdClose
               className="close-icon"
               onClick={() => setSelectedNote(null)}
+              style={{ cursor: "pointer" }}
             />
           </div>
 

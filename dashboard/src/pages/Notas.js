@@ -80,8 +80,29 @@ const Notas = () => {
     }
   };
 
-  const togglePin = (noteId) => {                       
-    setNotes(notes.map((n) => n.id === noteId ? { ...n, pinned: !n.pinned } : n));
+// NUEVO: Fijar/Desfijar nota en la Base de Datos (PUT)
+  const togglePin = async (noteId) => {                       
+    const notaSeleccionada = notes.find(n => n.id === noteId);
+    if (!notaSeleccionada) return;
+
+    try {
+      const respuesta = await fetch(`http://localhost:8000/notas/${noteId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          es_fijado: !notaSeleccionada.pinned // Enviamos lo contrario a lo que tiene ahorita
+        })
+      });
+
+      if (respuesta.ok) {
+        // Actualizamos la vista
+        setNotes(notes.map((n) => n.id === noteId ? { ...n, pinned: !n.pinned } : n));
+      } else {
+        console.error("Error al fijar la nota en la base de datos");
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+    }
   };
 
   const handleSubmit = async (e) => {
