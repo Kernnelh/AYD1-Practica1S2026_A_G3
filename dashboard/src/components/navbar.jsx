@@ -9,9 +9,9 @@ const Navbar = ({show}) => {
                 <li><Link to="/">Notas</Link></li>  
                 <li><Link to="/modify">Modificar Nota</Link></li>
                 <li><Link to="/delete">Eliminar Nota</Link></li>
-                <li><Link to="/set">Fijar Nota</Link></li>
                 <li><Link to="/archived">Archivar Nota</Link></li>
                 <li><Link to="/shared">Compartir Nota</Link></li>
+                <li><Link to="/login">Cerrar Sesion</Link></li>
             </ul>
         </div>
     )
