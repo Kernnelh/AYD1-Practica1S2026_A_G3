@@ -72,3 +72,22 @@ def modificar_nota(nota_id: int, nota_actualizada: schemas.NotaUpdate, db: Sessi
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al modificar la nota: {str(e)}")
+
+# --- ENDPOINT NUEVO: ELIMINAR UNA NOTA (DELETE) ---
+@router.delete("/{nota_id}")
+def eliminar_nota(nota_id: int, db: Session = Depends(get_db)):
+    # 1. Buscamos si la nota existe
+    nota_db = db.query(models.Nota).filter(models.Nota.id == nota_id).first()
+    
+    # 2. Si no existe, devolvemos un error 404
+    if not nota_db:
+        raise HTTPException(status_code=404, detail="La nota que intentas eliminar no existe")
+    
+    # 3. Eliminamos la nota de la base de datos
+    try:
+        db.delete(nota_db)
+        db.commit()
+        return {"mensaje": "Nota eliminada exitosamente"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al eliminar la nota: {str(e)}")
