@@ -2,11 +2,20 @@ from sqlalchemy import Column, Integer, String, Text, Boolean, TIMESTAMP, Foreig
 from sqlalchemy.sql import func
 from database import Base
 
+
+class Usuario(Base):
+    __tablename__ = "usuarios"
+
+    id = Column(Integer, primary_key=True, index=True)
+    usuario = Column(String(50), nullable=False, unique=True)
+    password = Column(String(255), nullable=False)
+
+
 class Nota(Base):
     __tablename__ = "notas"
 
     id = Column(Integer, primary_key=True, index=True)
-    id_usuario = Column(Integer, nullable=False) # Llave foránea hacia usuarios
+    id_usuario = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"), nullable=False)
     titulo = Column(String(150), nullable=False)
     descripcion = Column(Text, nullable=True)
     es_fijado = Column(Boolean, default=False)
