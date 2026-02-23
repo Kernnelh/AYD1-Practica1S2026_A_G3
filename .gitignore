@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Node modules
 node_modules/
 
@@ -39,3 +40,6 @@ coverage/
 # Misc
 *.key
 *.pem
+=======
+backend/__pycache__/
+>>>>>>> develop
