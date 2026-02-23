@@ -62,24 +62,25 @@ function App() {
       
       <div className={`main ${showNav ? "shifted" : ""}`}>
         <Routes>
+          {/* El login ahora es la página de inicio ("/") */}
+          <Route path="/" element={<InicioSesion />} />
 
-          <Route path="/" element={<Notas notes={notes} setNotes={setNotes} archivedNotes={archivedNotes} setArchivedNotes={setArchivedNotes} />} />
+          {/* Las notas ahora se muestran en "/notas" (a donde manda el login tras el éxito) */}
+          <Route 
+            path="/notas" 
+            element={<Notas notes={notes} setNotes={setNotes} archivedNotes={archivedNotes} setArchivedNotes={setArchivedNotes} />} 
+          />
+          
           <Route path="/archived" element={<Archivados notes={archivedNotes} setNotes={setNotes} setArchivedNotes={setArchivedNotes} />} />
-          
-          <Route path="/set" element={<Fijados />} />           
+          <Route path="/set" element={<Fijados />} />          
           <Route path="/shared" element={<Compartidos />} />
-          
           <Route path="/modify" element={<ModificarNotas notes={notes} setNotes={setNotes} />} />
           
-                  {/* Rutas de tu compañero */}
+          {/* Rutas de tu compañero */}
           <Route path="/register" element={<Registro />} />
           <Route path="/profile" element={<Perfil />} />
-          <Route path="/login" element={<InicioSesion />} />
-
-
-
-
-          </Routes>
+          {/* Eliminé la ruta vieja de /login porque ya la pusimos en "/" */}
+        </Routes>
       </div>
     </>
   );
