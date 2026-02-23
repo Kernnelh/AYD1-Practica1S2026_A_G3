@@ -50,9 +50,34 @@ const Notas = () => {
     setEditDescription(note.description || "");
   };
 
-  const handleArchive = (note) => {
-    setNotes(notes.filter((n) => n.id !== note.id));
-    setArchivedNotes([note, ...archivedNotes]);
+// NUEVO: Archivar nota (PUT)
+  const handleArchive = async (note) => {
+    try {
+      // Hacemos un PUT enviando únicamente el campo es_archivado como true
+      const respuesta = await fetch(`http://localhost:8000/notas/${note.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          es_archivado: true
+        })
+      });
+
+      if (respuesta.ok) {
+        // 1. Quitamos la nota de la lista principal visualmente
+        setNotes(notes.filter((n) => n.id !== note.id));
+        // 2. La agregamos a la lista de archivadas local
+        setArchivedNotes([{ ...note, archived: true }, ...archivedNotes]);
+        
+        // 3. Si la nota estaba abierta en el panel de edición, la cerramos
+        if (selectedNote && selectedNote.id === note.id) {
+          setSelectedNote(null);
+        }
+      } else {
+        console.error("Error al archivar la nota en la base de datos");
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+    }
   };
 
   const togglePin = (noteId) => {                       
