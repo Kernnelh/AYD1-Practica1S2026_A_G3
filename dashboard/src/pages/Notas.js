@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaTag, FaThumbtack } from "react-icons/fa";
+import { FaTag, FaThumbtack, FaTrash } from "react-icons/fa"; // NUEVO: Importamos FaTrash
 import { IoMdEye, IoMdClose } from "react-icons/io";
 import { GoArchive } from "react-icons/go";
 
@@ -10,18 +10,15 @@ const Notas = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
   
-  // Estados para CREAR nota
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState("");
   const [tags, setTags] = useState([]);
   const [error, setError] = useState("");
 
-  // NUEVO: Estados para EDITAR nota
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
-  // Cargar notas desde el backend
   useEffect(() => {
     const fetchNotas = async () => {
       try {
@@ -47,7 +44,6 @@ const Notas = () => {
     fetchNotas();
   }, []);
 
-  // Seleccionar nota para ver/editar en el panel derecho
   const handleSelectNote = (note) => {
     setSelectedNote(note);
     setEditTitle(note.title);
@@ -63,7 +59,6 @@ const Notas = () => {
     setNotes(notes.map((n) => n.id === noteId ? { ...n, pinned: !n.pinned } : n));
   };
 
-  // Guardar NUEVA nota
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (title.trim() === "") {
@@ -108,7 +103,6 @@ const Notas = () => {
     }
   };
 
-  // NUEVO: Guardar nota MODIFICADA (PUT)
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -122,16 +116,40 @@ const Notas = () => {
       });
 
       if (respuesta.ok) {
-        // Actualizamos la lista local de notas para que se refleje el cambio instantáneamente
         setNotes(notes.map(n => 
           n.id === selectedNote.id 
             ? { ...n, title: editTitle, description: editDescription } 
             : n
         ));
-        // Cerramos el panel derecho
         setSelectedNote(null);
       } else {
         console.error("Error al modificar la nota");
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+    }
+  };
+
+  // NUEVO: Eliminar nota (DELETE)
+  const handleDelete = async (noteId) => {
+    if (!window.confirm("¿Estás seguro de que deseas eliminar esta nota de forma permanente?")) {
+      return;
+    }
+
+    try {
+      const respuesta = await fetch(`http://localhost:8000/notas/${noteId}`, {
+        method: 'DELETE',
+      });
+
+      if (respuesta.ok) {
+        // Quitamos la nota de la lista visual
+        setNotes(notes.filter(n => n.id !== noteId));
+        // Si el panel de edición estaba abierto con esta nota, lo cerramos
+        if (selectedNote && selectedNote.id === noteId) {
+          setSelectedNote(null);
+        }
+      } else {
+        console.error("Error al eliminar la nota");
       }
     } catch (error) {
       console.error("Error de conexión:", error);
@@ -186,6 +204,12 @@ const Notas = () => {
                       className={`pin-icon ${note.pinned ? "pinned" : ""}`}
                       onClick={() => togglePin(note.id)}
                     />
+                    {/* NUEVO: Ícono de basurero */}
+                    <FaTrash 
+                      className="delete-icon" 
+                      onClick={() => handleDelete(note.id)} 
+                      style={{ color: "#d9534f", cursor: "pointer", marginLeft: "10px" }}
+                    />
                   </div>
                 </div>
               ))
@@ -193,7 +217,7 @@ const Notas = () => {
         </div>
       </div>
 
-      {/* ===== PANEL DERECHO (AHORA ES FORMULARIO DE EDICIÓN) ===== */}
+      {/* ===== PANEL DERECHO (FORMULARIO DE EDICIÓN) ===== */}
       {selectedNote && (
         <div className="note-panel">
           <div className="panel-header">
