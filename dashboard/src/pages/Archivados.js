@@ -1,38 +1,47 @@
 import { useState } from "react";
 import { FaTag } from "react-icons/fa";
 import { IoMdEye, IoMdClose } from "react-icons/io";
+import { GoArchive } from "react-icons/go";
 
-const Archivados = () => {
-  const [archivedNotes, setArchivedNotes] = useState([]);
+const Archivados = ({ notes = [], setNotes, setArchivedNotes }) => {
   const [selectedNote, setSelectedNote] = useState(null);
 
-  // Simulación inicial: luego se conectará al backend Flask
-  const demoNotes = [
-    { id: 1, title: "Nota archivada 1", description: "Ejemplo de descripción", tag: "Trabajo" },
-    { id: 2, title: "Nota archivada 2", description: "Otra descripción", tag: "Personal" }
-  ];
-
-  // Cargar notas de prueba al inicio
-  useState(() => {
-    setArchivedNotes(demoNotes);
-  }, []);
+  const handleUnarchive = (note) => {
+    setArchivedNotes(notes.filter((n) => n.id !== note.id));        // quitar de archivadas
+    setNotes((prev) => [note, ...prev]);                            // devolver a notas normales
+  };
 
   return (
     <div className="archived-layout">
-    <h2 style={{ color: "black", marginLeft: "15px", marginBottom: "15px" }}>Notas Archivadas</h2>
-
+      <h2 style={{ color: "black", marginLeft: "15px", marginBottom: "15px" }}>
+        Notas Archivadas
+      </h2>
 
       {/* LISTA DE NOTAS ARCHIVADAS */}
       <div className="notes-list">
-        {archivedNotes.map((note) => (
-          <div key={note.id} className="note-item">
-            <span>{note.title}</span>
-            <IoMdEye
-              className="eye-icon"
-              onClick={() => setSelectedNote(note)}
-            />
-          </div>
-        ))}
+        {notes.length === 0 ? (
+          <p style={{ color: "black" }}>No hay notas archivadas</p>
+        ) : (
+          notes.map((note) => (
+            <div key={note.id} className="note-item">
+              <span>{note.title}</span>
+              <div className="note-actions">
+                <IoMdEye
+                className="eye-icon"
+                onClick={() => setSelectedNote(note)}
+                />
+                <GoArchive
+                className="archive-icon"
+                onClick={() => handleUnarchive(note)}
+                />
+            </div>
+            </div>
+
+
+
+
+          ))
+        )}
       </div>
 
       {/* PANEL DERECHO */}
@@ -63,3 +72,5 @@ const Archivados = () => {
 };
 
 export default Archivados;
+
+// FUNCIONANDO HASTA EL MOMENTO

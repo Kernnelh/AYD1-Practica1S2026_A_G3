@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { FaTag } from "react-icons/fa";
 import { IoMdEye, IoMdClose } from "react-icons/io";
+import { GoArchive } from "react-icons/go";
+import { FaThumbtack } from "react-icons/fa";                //ícono para fijar notas
 
-const Notas = () => {
+
+const Notas = ({ notes, setNotes, archivedNotes, setArchivedNotes }) => {
   const [showForm, setShowForm] = useState(false);
-  const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
 
   const [title, setTitle] = useState("");
@@ -13,6 +15,22 @@ const Notas = () => {
   const [tags, setTags] = useState([]);
   const [error, setError] = useState("");
 
+  // Archivar nota
+  const handleArchive = (note) => {
+    setNotes(notes.filter((n) => n.id !== note.id));
+    setArchivedNotes([note, ...archivedNotes]);
+  };
+
+  const togglePin = (noteId) => {                       // Para fijar/desfijar nota
+  setNotes(
+    notes.map((n) =>
+      n.id === noteId ? { ...n, pinned: !n.pinned } : n
+    )
+  );
+  };
+
+
+  // Crear nueva nota
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -30,10 +48,12 @@ const Notas = () => {
       title,
       description,
       tag,
+      pinned: false         // la funcionalidad para saber si esta o no fijada
     };
 
     setNotes([newNote, ...notes]);
 
+    // Reset form
     setTitle("");
     setDescription("");
     setTag("");
@@ -89,19 +109,40 @@ const Notas = () => {
           </div>
         )}
 
-        {/* LISTA DE NOTAS */}
-        <div className="notes-list">
-          {notes.map((note) => (
+    {/* LISTA DE NOTAS */}
+    <div className="notes-list">
+      {notes.length === 0 ? (
+        <p style={{ color: "black" }}>No hay notas creadas</p>
+      ) : (
+        [...notes] // copiamos el array
+          .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)) // ordenamos para mostrar primero las fijadas
+          .map((note) => (
             <div key={note.id} className="note-item">
               <span>{note.title}</span>
 
-              <IoMdEye
-                className="eye-icon"
-                onClick={() => setSelectedNote(note)}
-              />
+              {/* Contenedor de íconos */}
+              <div className="note-actions">
+                <IoMdEye
+                  className="eye-icon"
+                  onClick={() => setSelectedNote(note)}
+                />
+
+                <GoArchive
+                  className="archive-icon"
+                  onClick={() => handleArchive(note)}
+                />
+
+                <FaThumbtack
+                  className={`pin-icon ${note.pinned ? "pinned" : ""}`}
+                  onClick={() => togglePin(note.id)}
+                />
+              </div>
+
             </div>
-          ))}
-        </div>
+          ))
+      )}
+    </div>
+
       </div>
 
       {/* ===== PANEL DERECHO ===== */}
@@ -132,3 +173,5 @@ const Notas = () => {
 };
 
 export default Notas;
+
+// funciona por el  momento

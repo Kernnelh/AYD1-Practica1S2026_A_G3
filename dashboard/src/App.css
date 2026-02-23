@@ -389,4 +389,59 @@ header svg {
   justify-content: space-between;
   align-items: center;
 }
-/*FIJADOS*/
+
+
+
+
+
+
+.notification-menu {              
+  position: absolute;
+  top: 60px;        
+  left: 1250px;      
+  background: #102f44;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  width: 250px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+.notification-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.notification-menu li {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.notification-menu li:last-child {
+  border-bottom: none;
+}
+
+
+
+/*pin Fijados*/
+.pin-icon {
+  cursor: pointer;
+  margin-left: 8px;
+  color: gray;                              /* Color cuando no esta fijado*/
+}
+
+.pin-icon.pinned {
+  color: orange;                            /* resaltado cuando está fijada */
+}
+
+
+.note-actions {                               /* espacio uniforme entre íconos */              
+  display: flex;
+  gap: 8px; 
+}
+
+
+
+
