@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // <-- CORRECCIÓN 1
 import { Routes, Route } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
 import Navbar from "./components/navbar";
+import { FaShareAlt } from "react-icons/fa";
 
 import "./App.css";
 import { IoNotificationsCircle } from "react-icons/io5";
@@ -25,10 +26,34 @@ import { UserProvider } from './UserContext';
 
 function App() {
   const [showNav, setShowNav] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false); // <-- CORRECCIÓN 2
+  const [notificaciones, setNotificaciones] = useState([]);
+
+  // Cada vez que se abra la campanita, disparamos el fetch al backend
+  useEffect(() => {
+    const fetchNotificaciones = async () => {
+      const idUsuario = localStorage.getItem('usuario_id');
+      if (!idUsuario) return;
+
+      try {
+        const respuesta = await fetch(`http://localhost:8000/notas/notificaciones/${idUsuario}`);
+        if (respuesta.ok) {
+          const data = await respuesta.json();
+          setNotificaciones(data);
+        }
+      } catch (error) {
+        console.error("Error al cargar notificaciones:", error);
+      }
+    };
+
+    if (showNotifications) {
+      fetchNotificaciones();
+    }
+  }, [showNotifications]); // Se ejecuta cuando showNotifications cambia a true
 
   const [notes, setNotes] = useState([]);                     // para mostrar siempre las notas normales
   const [archivedNotes, setArchivedNotes] = useState([]);     // para mostrar siempre las notas archivadas
+  
 
 
   return (
@@ -50,10 +75,30 @@ function App() {
         />
 
         {/* Menú de notificaciones */}
+        {/* Menú de notificaciones */}
         {showNotifications && (
-          <div className="notification-menu">
-            <h4>Notificaciones</h4>
-            <ul>
+          <div className="notification-menu" style={{ position: 'absolute', right: '20px', top: '60px', backgroundColor: 'white', border: '1px solid #ccc', borderRadius: '5px', width: '300px', zIndex: 1000, boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
+            <h4 style={{ margin: '0', padding: '10px', backgroundColor: '#002b5e', color: 'white', borderRadius: '5px 5px 0 0' }}>Notificaciones</h4>
+            <ul style={{ listStyle: 'none', padding: '0', margin: '0', maxHeight: '300px', overflowY: 'auto' }}>
+              
+              {notificaciones.length === 0 ? (
+                <li style={{ padding: "15px", color: "gray", fontSize: "14px", textAlign: "center" }}>
+                  No tienes notificaciones
+                </li>
+              ) : (
+                notificaciones.map((notif, index) => (
+                  <li key={index} style={{ padding: "12px", borderBottom: "1px solid #eee", display: "flex", alignItems: "center", gap: "15px" }}>
+                    {/* El ícono que pide el enunciado */}
+                    <FaShareAlt style={{ color: "#007bff", fontSize: "20px" }} /> 
+                    <div style={{ color: "black" }}>
+                      {/* El nombre de usuario del propietario */}
+                      <p style={{ margin: 0, fontSize: "14px" }}><strong>{notif.propietario}</strong> te compartió:</p>
+                      <p style={{ margin: 0, fontSize: "13px", color: "#555" }}>{notif.titulo}</p>
+                    </div>
+                  </li>
+                ))
+              )}
+
             </ul>
           </div>
         )}

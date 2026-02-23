@@ -143,3 +143,22 @@ def leer_notas_compartidas(mi_usuario_id: int, db: Session = Depends(get_db)):
     ).all()
     
     return notas_prestadas
+
+# --- ENDPOINT: NOTIFICACIONES (CAMPANITA) ---
+@router.get("/notificaciones/{mi_usuario_id}")
+def leer_notificaciones(mi_usuario_id: int, db: Session = Depends(get_db)):
+    # Hacemos un JOIN triple: NotasCompartidas -> Notas -> Usuarios (para el nombre del dueño)
+    notificaciones = db.query(
+        models.Nota.id,
+        models.Nota.titulo,
+        models.Usuario.usuario.label("propietario")
+    ).join(
+        models.NotaCompartida, models.Nota.id == models.NotaCompartida.id_nota
+    ).join(
+        models.Usuario, models.Nota.id_usuario == models.Usuario.id
+    ).filter(
+        models.NotaCompartida.id_usuario_compartido == mi_usuario_id
+    ).all()
+    
+    # Devolvemos un JSON simple para la campanita
+    return [{"id_nota": n.id, "titulo": n.titulo, "propietario": n.propietario} for n in notificaciones]
