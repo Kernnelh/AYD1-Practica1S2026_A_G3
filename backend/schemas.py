@@ -46,3 +46,11 @@ class UsuarioResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# Esquema para actualizar una nota (los campos son opcionales)
+class NotaUpdate(BaseModel):
+    titulo: Optional[str] = Field(None, min_length=1, description="El título no puede ir vacío si se envía")
+    descripcion: Optional[str] = None
+    es_fijado: Optional[bool] = None
+    es_archivado: Optional[bool] = None
