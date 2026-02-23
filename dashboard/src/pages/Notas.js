@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaTag, FaThumbtack, FaTrash } from "react-icons/fa"; // NUEVO: Importamos FaTrash
+import { FaTag, FaThumbtack, FaTrash, FaShareAlt } from "react-icons/fa"; // NUEVO: Importamos FaTrash
 import { IoMdEye, IoMdClose } from "react-icons/io";
 import { GoArchive } from "react-icons/go";
 
@@ -202,6 +202,35 @@ const Notas = () => {
     }
   };
 
+  // Compartir nota (POST)
+  const handleShare = async (noteId) => {
+    const usuarioDestino = window.prompt("Ingresa el nombre de usuario de la persona con la que quieres compartir esta nota:");
+    
+    if (!usuarioDestino || usuarioDestino.trim() === "") return;
+
+    try {
+      const idUsuarioActual = localStorage.getItem('usuario_id');
+      const respuesta = await fetch(`http://localhost:8000/notas/${noteId}/compartir?usuario_id_actual=${idUsuarioActual}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuario_a_compartir: usuarioDestino.trim()
+        })
+      });
+
+      const data = await respuesta.json();
+
+      if (respuesta.ok) {
+        alert(`¡Éxito! ${data.mensaje}`);
+      } else {
+        alert(`Error: ${data.detail}`);
+      }
+    } catch (error) {
+      console.error("Error de conexión al compartir:", error);
+      alert("Hubo un error de conexión.");
+    }
+  };
+
   return (
     <div className="notas-layout">
       {/* ===== ZONA IZQUIERDA ===== */}
@@ -255,6 +284,11 @@ const Notas = () => {
                       className="delete-icon" 
                       onClick={() => handleDelete(note.id)} 
                       style={{ color: "#d9534f", cursor: "pointer", marginLeft: "10px" }}
+                    />
+                    <FaShareAlt 
+                      className="share-icon" 
+                      onClick={() => handleShare(note.id)} 
+                      style={{ color: "#28a745", cursor: "pointer", marginLeft: "10px" }}
                     />
                   </div>
                 </div>
