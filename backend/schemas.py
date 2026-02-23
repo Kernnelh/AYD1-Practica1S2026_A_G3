@@ -54,3 +54,7 @@ class NotaUpdate(BaseModel):
     descripcion: Optional[str] = None
     es_fijado: Optional[bool] = None
     es_archivado: Optional[bool] = None
+
+# Esquema para recibir la solicitud de compartir
+class CompartirNota(BaseModel):
+    usuario_a_compartir: str  # El frontend nos mandará el nombre de usuario del amigo

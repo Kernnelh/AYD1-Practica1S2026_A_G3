@@ -97,3 +97,49 @@ def eliminar_nota(nota_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al eliminar la nota: {str(e)}")
+
+# --- ENDPOINT: COMPARTIR UNA NOTA (POST) ---
+@router.post("/{nota_id}/compartir")
+def compartir_nota(nota_id: int, datos: schemas.CompartirNota, usuario_id_actual: int, db: Session = Depends(get_db)):
+    # 1. Buscamos al usuario al que le queremos compartir la nota
+    usuario_destino = db.query(models.Usuario).filter(models.Usuario.usuario == datos.usuario_a_compartir).first()
+    
+    if not usuario_destino:
+        raise HTTPException(status_code=404, detail="El usuario ingresado no existe")
+        
+    # 2. Verificamos que no se la estemos compartiendo a la misma persona dos veces
+    ya_compartida = db.query(models.NotaCompartida).filter(
+        models.NotaCompartida.id_nota == nota_id,
+        models.NotaCompartida.id_usuario_compartido == usuario_destino.id
+    ).first()
+    
+    if ya_compartida:
+        raise HTTPException(status_code=400, detail="La nota ya está compartida con este usuario")
+
+    # 3. Guardamos el registro en la tabla intermedia
+    nuevo_compartido = models.NotaCompartida(
+        id_nota=nota_id,
+        id_usuario=usuario_id_actual,
+        id_usuario_compartido=usuario_destino.id
+    )
+    
+    try:
+        db.add(nuevo_compartido)
+        db.commit()
+        return {"mensaje": f"Nota compartida exitosamente con {usuario_destino.usuario}"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Error al compartir la nota")
+
+
+# --- ENDPOINT: OBTENER NOTAS COMPARTIDAS CONMIGO (GET) ---
+@router.get("/compartidas/{mi_usuario_id}", response_model=list[schemas.NotaResponse])
+def leer_notas_compartidas(mi_usuario_id: int, db: Session = Depends(get_db)):
+    # Hacemos un JOIN entre la tabla 'notas' y 'notas_compartidas'
+    notas_prestadas = db.query(models.Nota).join(
+        models.NotaCompartida, models.Nota.id == models.NotaCompartida.id_nota
+    ).filter(
+        models.NotaCompartida.id_usuario_compartido == mi_usuario_id
+    ).all()
+    
+    return notas_prestadas

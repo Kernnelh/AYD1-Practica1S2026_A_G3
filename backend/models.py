@@ -22,3 +22,12 @@ class Nota(Base):
     es_archivado = Column(Boolean, default=False)
     creado_en = Column(TIMESTAMP, server_default=func.now())
     editado_en = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+
+# --- MODELO PARA NOTAS COMPARTIDAS ---
+class NotaCompartida(Base):
+    __tablename__ = "notas_compartidas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    id_nota = Column(Integer, ForeignKey("notas.id"))
+    id_usuario = Column(Integer, ForeignKey("usuarios.id"))
+    id_usuario_compartido = Column(Integer, ForeignKey("usuarios.id"))
