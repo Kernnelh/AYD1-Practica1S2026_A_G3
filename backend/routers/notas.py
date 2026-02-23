@@ -43,3 +43,32 @@ def crear_nota(nota: schemas.NotaCreate, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback() # Si algo falla, deshacemos los cambios por seguridad
         raise HTTPException(status_code=500, detail=f"Error al crear la nota: {str(e)}")
+
+# --- ENDPOINT NUEVO: MODIFICAR UNA NOTA (PUT) ---
+@router.put("/{nota_id}", response_model=schemas.NotaResponse)
+def modificar_nota(nota_id: int, nota_actualizada: schemas.NotaUpdate, db: Session = Depends(get_db)):
+    # 1. Buscamos si la nota existe en la base de datos
+    nota_db = db.query(models.Nota).filter(models.Nota.id == nota_id).first()
+    
+    # 2. Si no existe, devolvemos un error 404 (Not Found)
+    if not nota_db:
+        raise HTTPException(status_code=404, detail="La nota que intentas modificar no existe")
+    
+    # 3. Actualizamos solo los campos que el frontend nos envió
+    if nota_actualizada.titulo is not None:
+        nota_db.titulo = nota_actualizada.titulo
+    if nota_actualizada.descripcion is not None:
+        nota_db.descripcion = nota_actualizada.descripcion
+    if nota_actualizada.es_fijado is not None:
+        nota_db.es_fijado = nota_actualizada.es_fijado
+    if nota_actualizada.es_archivado is not None:
+        nota_db.es_archivado = nota_actualizada.es_archivado
+        
+    # 4. Guardamos los cambios en MySQL
+    try:
+        db.commit()
+        db.refresh(nota_db)
+        return nota_db
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al modificar la nota: {str(e)}")
