@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+from typing import Optional
 from database import get_db
 import models
 import schemas
@@ -11,12 +12,17 @@ router = APIRouter(
     tags=["Notas"]
 )
 
-# Endpoint para OBTENER todas las notas (Método GET)
-@router.get("/", response_model=List[schemas.NotaResponse])
-def obtener_notas(db: Session = Depends(get_db)):
-    # Le decimos a SQLAlchemy que traiga todos los registros de la tabla Notas
-    notas = db.query(models.Nota).all()
-    return notas
+# --- ENDPOINT MODIFICADO: OBTENER NOTAS (CON FILTRO DE USUARIO) ---
+@router.get("/", response_model=list[schemas.NotaResponse])
+def leer_notas(usuario_id: Optional[int] = None, db: Session = Depends(get_db)):
+    # Si el frontend nos manda un usuario_id, filtramos la base de datos
+    if usuario_id:
+        notas_db = db.query(models.Nota).filter(models.Nota.id_usuario == usuario_id).all()
+    # Si no nos manda nada, devolvemos todas (útil para el administrador en el futuro)
+    else:
+        notas_db = db.query(models.Nota).all()
+        
+    return notas_db
 
 # Endpoint para AGREGAR una nota (Método POST)
 @router.post("/", response_model=schemas.NotaResponse)
