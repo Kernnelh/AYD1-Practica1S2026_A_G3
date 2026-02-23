@@ -1,22 +1,36 @@
 import React, { useState } from 'react';
 
 export default function Registro() {
-  const [formulario, setFormulario] = useState({ name: '', email: '', password: '' });
+  const [formulario, setFormulario] = useState({ usuario: '', password: '' });
   const [mensaje, setMensaje] = useState('');
+  const [enviando, setEnviando] = useState(false);
 
   const manejarCambio = e =>
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
 
-  const manejarEnvio = e => {
+  const manejarEnvio = async e => {
     e.preventDefault();
     setMensaje('');
+    setEnviando(true);
+
     try {
-      // Guardar usuario en localStorage
-      localStorage.setItem('usuario', JSON.stringify(formulario));
-      setMensaje('Registro exitoso. Puedes iniciar sesión.');
-      setFormulario({ name: '', email: '', password: '' });
+      const res = await fetch('http://localhost:8000/usuarios/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario: formulario.usuario, password: formulario.password })
+      });
+
+      if (res.status === 201) {
+        setMensaje('Registro exitoso. Puedes iniciar sesión.');
+        setFormulario({ usuario: '', password: '' });
+      } else {
+        const data = await res.json();
+        setMensaje(data.detail || 'Error en el registro');
+      }
     } catch (err) {
-      setMensaje('Error en el registro local');
+      setMensaje('No se pudo conectar con el servidor');
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -24,18 +38,10 @@ export default function Registro() {
     <div className="card">
       <h2>Registro</h2>
       <form onSubmit={manejarEnvio} className="form">
-        <label>Nombre</label>
+        <label>Usuario</label>
         <input
-          name="name"
-          value={formulario.name}
-          onChange={manejarCambio}
-          required
-        />
-        <label>Email</label>
-        <input
-          name="email"
-          type="email"
-          value={formulario.email}
+          name="usuario"
+          value={formulario.usuario}
           onChange={manejarCambio}
           required
         />
@@ -47,7 +53,7 @@ export default function Registro() {
           onChange={manejarCambio}
           required
         />
-        <button type="submit">Registrar</button>
+        <button type="submit" disabled={enviando}>{enviando ? 'Enviando...' : 'Registrar'}</button>
       </form>
       {mensaje && <p className="msg">{mensaje}</p>}
     </div>
