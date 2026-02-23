@@ -1,40 +1,34 @@
-import { useState, useEffect, useContext } from "react";
-import { UserContext } from '../UserContext';
+import { useState, useEffect } from "react";
 import { FaTag, FaThumbtack } from "react-icons/fa";
 import { IoMdEye, IoMdClose } from "react-icons/io";
 import { GoArchive } from "react-icons/go";
 
 const Notas = () => {
-  // Convertimos las props en estado local para que el componente sea independiente y rápido de probar
   const [notes, setNotes] = useState([]);
   const [archivedNotes, setArchivedNotes] = useState([]);
   
   const [showForm, setShowForm] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
+  
+  // Estados para CREAR nota
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState("");
   const [tags, setTags] = useState([]);
   const [error, setError] = useState("");
-  const { user } = useContext(UserContext);
 
-  // NUEVO: Cargar notas desde el backend al iniciar
-// NUEVO: Cargar notas desde el backend filtradas por el usuario logueado
+  // NUEVO: Estados para EDITAR nota
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+
+  // Cargar notas desde el backend
   useEffect(() => {
     const fetchNotas = async () => {
       try {
-        // 1. Recuperamos el ID del usuario que inició sesión
         const idUsuario = localStorage.getItem('usuario_id');
-        
-        // Si por alguna razón no hay usuario (alguien entró a la fuerza a la ruta), detenemos la ejecución
-        if (!idUsuario) {
-          console.warn("No hay sesión activa");
-          return;
-        }
+        if (!idUsuario) return;
 
-        // 2. Pasamos el ID por la URL como parámetro de búsqueda (?usuario_id=X)
         const respuesta = await fetch(`http://localhost:8000/notas/?usuario_id=${idUsuario}`);
-        
         if (respuesta.ok) {
           const data = await respuesta.json();
           const notasFormateadas = data.map(n => ({
@@ -51,20 +45,25 @@ const Notas = () => {
       }
     };
     fetchNotas();
-  }, []); // El array vacío asegura que esto solo corra 1 vez al cargar la pantalla
+  }, []);
+
+  // Seleccionar nota para ver/editar en el panel derecho
+  const handleSelectNote = (note) => {
+    setSelectedNote(note);
+    setEditTitle(note.title);
+    setEditDescription(note.description || "");
+  };
 
   const handleArchive = (note) => {
     setNotes(notes.filter((n) => n.id !== note.id));
     setArchivedNotes([note, ...archivedNotes]);
-    // Nota para después del release: Aquí iría el fetch PUT para es_archivado
   };
 
   const togglePin = (noteId) => {                       
     setNotes(notes.map((n) => n.id === noteId ? { ...n, pinned: !n.pinned } : n));
-    // Nota para después del release: Aquí iría el fetch PUT para es_fijado
   };
 
-  // NUEVO: Guardar nota real en el backend
+  // Guardar NUEVA nota
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (title.trim() === "") {
@@ -72,9 +71,7 @@ const Notas = () => {
       return;
     }
 
-    // Obtenemos el ID del usuario que se logueó, si no hay, usamos 1 por seguridad
-    const idUsuario = (user && user.id) ? user.id : (localStorage.getItem('usuario_id') || 1);
-
+    const idUsuario = localStorage.getItem('usuario_id') || 1;
     const nuevaNotaBD = {
       id_usuario: parseInt(idUsuario),
       titulo: title,
@@ -111,6 +108,36 @@ const Notas = () => {
     }
   };
 
+  // NUEVO: Guardar nota MODIFICADA (PUT)
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const respuesta = await fetch(`http://localhost:8000/notas/${selectedNote.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titulo: editTitle,
+          descripcion: editDescription
+        })
+      });
+
+      if (respuesta.ok) {
+        // Actualizamos la lista local de notas para que se refleje el cambio instantáneamente
+        setNotes(notes.map(n => 
+          n.id === selectedNote.id 
+            ? { ...n, title: editTitle, description: editDescription } 
+            : n
+        ));
+        // Cerramos el panel derecho
+        setSelectedNote(null);
+      } else {
+        console.error("Error al modificar la nota");
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+    }
+  };
+
   return (
     <div className="notas-layout">
       {/* ===== ZONA IZQUIERDA ===== */}
@@ -135,17 +162,6 @@ const Notas = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
-              <input
-                list="tags"
-                placeholder="Etiqueta"
-                value={tag}
-                onChange={(e) => setTag(e.target.value)}
-              />
-              <datalist id="tags">
-                {tags.map((t, index) => (
-                  <option key={index} value={t} />
-                ))}
-              </datalist>
               <button type="submit" className="btn-save">
                 Guardar nota
               </button>
@@ -153,46 +169,56 @@ const Notas = () => {
           </div>
         )}
 
-    {/* LISTA DE NOTAS */}
-    <div className="notes-list">
-      {notes.length === 0 ? (
-        <p style={{ color: "black" }}>No hay notas creadas</p>
-      ) : (
-        [...notes] 
-          .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)) 
-          .map((note) => (
-            <div key={note.id} className="note-item">
-              <span>{note.title}</span>
-              <div className="note-actions">
-                <IoMdEye className="eye-icon" onClick={() => setSelectedNote(note)} />
-                <GoArchive className="archive-icon" onClick={() => handleArchive(note)} />
-                <FaThumbtack
-                  className={`pin-icon ${note.pinned ? "pinned" : ""}`}
-                  onClick={() => togglePin(note.id)}
-                />
-              </div>
-            </div>
-          ))
-      )}
-    </div>
+        {/* LISTA DE NOTAS */}
+        <div className="notes-list">
+          {notes.length === 0 ? (
+            <p style={{ color: "black" }}>No hay notas creadas</p>
+          ) : (
+            [...notes] 
+              .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)) 
+              .map((note) => (
+                <div key={note.id} className="note-item">
+                  <span>{note.title}</span>
+                  <div className="note-actions">
+                    <IoMdEye className="eye-icon" onClick={() => handleSelectNote(note)} />
+                    <GoArchive className="archive-icon" onClick={() => handleArchive(note)} />
+                    <FaThumbtack
+                      className={`pin-icon ${note.pinned ? "pinned" : ""}`}
+                      onClick={() => togglePin(note.id)}
+                    />
+                  </div>
+                </div>
+              ))
+          )}
+        </div>
       </div>
 
-      {/* ===== PANEL DERECHO ===== */}
+      {/* ===== PANEL DERECHO (AHORA ES FORMULARIO DE EDICIÓN) ===== */}
       {selectedNote && (
         <div className="note-panel">
           <div className="panel-header">
-            <h3>{selectedNote.title}</h3>
+            <h3>Editar Nota</h3>
             <IoMdClose className="close-icon" onClick={() => setSelectedNote(null)} />
           </div>
-          <div className="panel-content">
-            {selectedNote.description || "Sin descripción"}
-          </div>
-          {selectedNote.tag && (
-            <div className="panel-tag">
-              <FaTag />
-              <span>{selectedNote.tag}</span>
-            </div>
-          )}
+          
+          <form onSubmit={handleUpdate} className="edit-form" style={{display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px'}}>
+            <input 
+              type="text" 
+              value={editTitle} 
+              onChange={(e) => setEditTitle(e.target.value)} 
+              required
+              style={{padding: '8px', borderRadius: '5px', border: '1px solid #ccc'}}
+            />
+            <textarea 
+              value={editDescription} 
+              onChange={(e) => setEditDescription(e.target.value)} 
+              rows="5"
+              style={{padding: '8px', borderRadius: '5px', border: '1px solid #ccc', resize: 'vertical'}}
+            />
+            <button type="submit" className="btn-save" style={{marginTop: '10px'}}>
+              Guardar Cambios
+            </button>
+          </form>
         </div>
       )}
     </div>
@@ -200,5 +226,4 @@ const Notas = () => {
 };
 
 export default Notas;
-
 // funciona por el  momento
