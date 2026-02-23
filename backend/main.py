@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database import engine
-from routers import notas  # <-- NUEVO: Importamos tu router
+from routers import notas  
 
 app = FastAPI()
 
