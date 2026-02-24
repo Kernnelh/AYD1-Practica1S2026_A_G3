@@ -105,7 +105,7 @@ Permite al usuario ingresar al sistema mediante:
 - Nombre de usuario o correo electrónico  
 - Contraseña  
 
-![Texto alternativo](imgmuser/login.png)
+![Texto alternativo](./imgmuser/login.png)
 
 ---
 
@@ -117,7 +117,7 @@ Permite crear una nueva cuenta en el sistema Notecraft solicitando:
 
 Una vez registrado, el usuario podrá acceder a la interfaz principal.
 
-![Texto alternativo](imgmuser/registro.png)
+![Texto alternativo](./imgmuser/registro.PNG)
 
 ---
 
@@ -125,7 +125,7 @@ Una vez registrado, el usuario podrá acceder a la interfaz principal.
 
 Se muestra al iniciar sesión correctamente. En ella se visualizan todos los componentes y botones del sistema, identificados según su funcionalidad.
 
-![Texto alternativo](imgmuser/interfazprinc.png)
+![Texto alternativo](./imgmuser/interfazprinc.PNG)
 
 ---
 
@@ -136,7 +136,7 @@ Permite crear nuevas notas mediante un formulario que solicita:
 - **Contenido** (texto libre)  
 - **Tag** (crear uno nuevo o seleccionar uno existente)
 
-![Texto alternativo](imgmuser/addnota.png)
+![Texto alternativo](./imgmuser/addnota.PNG)
 
 ---
 
@@ -145,7 +145,7 @@ Permite crear nuevas notas mediante un formulario que solicita:
 Accesible desde el panel lateral izquierdo mediante la opción **Modificar nota**.  
 Permite editar notas existentes; si no existen, se mostrará un mensaje informativo.
 
-![Texto alternativo](imgmuser/modificarnota.png)
+![Texto alternativo](./imgmuser/modificarnota.PNG)
 
 ---
 
@@ -153,7 +153,7 @@ Permite editar notas existentes; si no existen, se mostrará un mensaje informat
 
 Permite archivar notas para reducir la relevancia de información antigua o poco utilizada.
 
-![Texto alternativo](imgmuser/archivarnota.png)
+![Texto alternativo](./imgmuser/archivarnota.PNG)
 
 ---
 
@@ -161,7 +161,7 @@ Permite archivar notas para reducir la relevancia de información antigua o poco
 
 Permite compartir una nota con otros usuarios y visualizar notas compartidas por terceros, fomentando la interacción social y un enfoque comercial moderno.
 
-![Texto alternativo](imgmuser/sharenota.png)
+![Texto alternativo](./imgmuser/sharenota.PNG)
 
 ---
 
@@ -172,7 +172,7 @@ Permite recibir alertas cuando:
 
 Las notificaciones se acceden mediante el icono de campana ubicado en la parte superior derecha de la interfaz principal.
 
-![Texto alternativo](imgmuser/notificacion.png)
+![Texto alternativo](./imgmuser/notificacion.PNG)
 
 ---
 
@@ -180,7 +180,7 @@ Las notificaciones se acceden mediante el icono de campana ubicado en la parte s
 
 Cierra la sesión actual y redirige al usuario a la pantalla de login.
 
-![Texto alternativo](imgmuser/cerrarsesion.png)
+![Texto alternativo](./imgmuser/cerrarsesion.PNG)
 
 ---
 
@@ -188,6 +188,6 @@ Cierra la sesión actual y redirige al usuario a la pantalla de login.
 
 Permite visualizar la información del usuario actualmente logueado, mejorando la verificación de datos y la seguridad.
 
-![Texto alternativo](imgmuser/perfil.png)
+![Texto alternativo](./imgmuser/perfil.PNG)
 
 ---
