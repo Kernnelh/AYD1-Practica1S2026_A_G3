@@ -1,0 +1,31 @@
+# ==========================================
+# DEPENDENCIAS DEL BACKEND - NOTECRAFT
+# ==========================================
+
+# 1. FRAMEWORK WEB
+# FastAPI es el marco de trabajo principal. Nos permite crear los "endpoints" 
+# (las URLs a las que se conectará el frontend para Agregar, Modificar o Eliminar notas). 
+# Es muy rápido e incluye validación de datos automática.
+fastapi
+
+# 2. SERVIDOR ASGI
+# Uvicorn es el motor que hace funcionar a FastAPI. Mientras FastAPI define 
+# "qué" hace la aplicación, Uvicorn es el servidor web real que "escucha" 
+# las peticiones del navegador o del frontend y envía las respuestas.
+uvicorn
+
+# 3. GESTIÓN DE VARIABLES DE ENTORNO
+# python-dotenv nos permite leer el archivo oculto ".env". Es vital por seguridad, ya que 
+# ahí guardaremos las contraseñas de la base de datos MySQL para que NO se suban 
+# al repositorio y nos penalicen en la calificación.
+python-dotenv
+
+# 4. ORM (Object-Relational Mapping)
+# SQLAlchemy nos permite interactuar con la base de datos usando código Python 
+# en lugar de escribir consultas SQL puras. Facilita mucho hacer el CRUD de las notas.
+sqlalchemy
+
+# 5. DRIVER DE MYSQL
+# PyMySQL es el conector oficial. Es el "puente" que usarán SQLAlchemy y Python 
+# para conectarse a la base de datos MySQL que tu compañero ya configuró en develop.
+pymysql
